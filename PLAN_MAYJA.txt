@@ -1,0 +1,255 @@
+
+MAYJA
+Tienda Online
+
+PLAN DE TRABAJO - E-COMMERCE DESDE CERO
+Stack: React + Node.js + PostgreSQL + TailwindCSS
+
+
+
+1. RESUMEN DEL PROYECTO
+
+Este documento es el plan de trabajo oficial para el desarrollo de la tienda online Mayja. Ha sido diseñado teniendo en cuenta tu nivel actual de programacion, tu infraestructura disponible (Droplet Digital Ocean + dominio), y como referencia visual el sitio HogarMas.pe.
+
+OBJETIVO: Crear un e-commerce funcional para Mayja con catalogo de productos (Hogar, Juguetes Sensoriales, Tecnologia, Ropa), carrito de compras, pago contra entrega, y panel de administracion propio, construido 100% con codigo propio sin WordPress.
+Stack Tecnologico Recomendado
+• Frontend: React + TailwindCSS
+- React es el framework mas demandado del mercado, facil de aprender y con enorme comunidad.
+- TailwindCSS permite diseñar interfaces bonitas rapidamente sin CSS complejo.
+• Backend: Node.js + Express
+- Mismo lenguaje (JavaScript) que el frontend. Menor curva de aprendizaje.
+- Express es simple y muy bien documentado para principiantes.
+• Base de datos: PostgreSQL
+- Gratuita, potente, y la mas usada en e-commerce profesional.
+• Almacenamiento de imagenes: GitHub + Cloudinary (gratuito)
+- Cloudinary ofrece plan gratis para imagenes de productos.
+• Control de versiones: Git + GitHub
+- Cada avance se guarda en GitHub como 'snapshot' del proyecto.
+• Servidor: Digital Ocean Droplet ($8/mes - Ubuntu)
+• Deployment: PM2 + Nginx (gratuitos)
+
+Caracteristicas de Mayja (MVP - Version 1)
+• Catalogo de hasta 10-15 productos al inicio
+• 4 categorias: Hogar, Juguetes Sensoriales, Tecnologia, Ropa
+• Variantes de productos: color y tamaño
+• Carrito de compras
+• Checkout con pago contra entrega
+• Integracion WhatsApp para consultas
+• Panel de administracion para agregar/editar productos
+• Diseño inspirado en HogarMas.pe con colores del logo Mayja
+
+
+
+2. SISTEMA DE BITACORA (MUY IMPORTANTE)
+
+Para no perder el progreso entre sesiones de trabajo con la IA, usaremos un sistema de bitacora. Esto significa que al final de cada sesion guardaras un archivo BITACORA.md con el estado actual del proyecto, y lo adjuntaras al inicio de cada nueva sesion.
+
+Como funciona el sistema
+• Al terminar cada sesion: la IA genera o actualiza el archivo BITACORA.md
+• Al iniciar cada nueva sesion: adjuntas la bitacora + este plan de trabajo
+• La IA lee solo la bitacora (no todo el codigo) y continua donde quedamos
+• Resultado: ahorro de tokens y contexto perfecto siempre
+
+Estructura del Repositorio GitHub
+mayja-ecommerce/ ??? PLAN_DE_TRABAJO.docx    <- Este documento ??? BITACORA.md             <- Estado del proyecto (actualizar siempre) ??? frontend/               <- Codigo React ??? backend/                <- Codigo Node.js + Express ??? database/               <- Scripts SQL de la base de datos ??? docs/                   <- Documentacion adicional
+Plantilla de BITACORA.md
+Al final de cada sesion, la IA completara esta plantilla contigo:
+# BITACORA MAYJA - [FECHA]  ## FASE ACTUAL: [Nombre de la fase] ## PASO ACTUAL: [Paso especifico]  ## LO QUE ESTA HECHO: - [Lista de componentes/funcionalidades completadas]  ## LO QUE FALTA EN ESTA FASE: - [Lista de tareas pendientes]  ## ARCHIVOS CREADOS/MODIFICADOS: - [Ruta del archivo] - [Descripcion breve]  ## COMANDOS PARA CONTINUAR: - [Comandos que debo ejecutar para retomar]  ## NOTAS IMPORTANTES: - [Cualquier detalle critico a recordar]  ## COMO INICIAR LA SIGUIENTE SESION: Adjuntar este archivo + PLAN_DE_TRABAJO.docx y decir: 'Continua el desarrollo de Mayja segun la bitacora adjunta'
+
+
+3. PLAN DE TRABAJO POR FASES
+
+El proyecto esta dividido en 6 fases. Cada fase termina con un entregable funcional y visible. Al terminar cada fase, haremos un snapshot en GitHub.
+
+FaseDescripcionDuracion estimadaResultado entregableFASE 0Preparacion del entorno (Servidor, GitHub, Node, React)1-2 sesionesServidor listo y repositorio configuradoFASE 1Estructura del proyecto y diseño base (Layout, Header, Footer)2-3 sesionesPagina web abierta en tu dominioFASE 2Catalogo de productos y pagina de detalle3-4 sesionesProductos visibles con variantesFASE 3Backend y base de datos (API REST + PostgreSQL)3-4 sesionesDatos reales desde la base de datosFASE 4Carrito de compras y checkout2-3 sesionesFlujo de compra completoFASE 5Panel de administracion y subida de productos2-3 sesionesTu propio panel para gestionar la tienda
+
+
+FASE 0: Preparacion del Entorno
+
+OBJETIVO: Tener el servidor listo, el repositorio en GitHub creado, y todas las herramientas instaladas en tu Droplet.
+Paso 0.1 - Configurar GitHub
+• Crear cuenta en github.com (si no tienes)
+• Crear repositorio nuevo: mayja-ecommerce (privado)
+• Instalar Git en tu computadora local
+• Crear los archivos iniciales: README.md, BITACORA.md, PLAN_DE_TRABAJO.docx
+
+Paso 0.2 - Preparar el Droplet de Digital Ocean
+• Conectarte via SSH a tu Droplet
+• Actualizar el sistema: sudo apt update && sudo apt upgrade
+• Instalar Node.js (version 20 LTS)
+• Instalar PostgreSQL
+• Instalar Nginx (servidor web que recibe las visitas)
+• Instalar PM2 (mantiene tu app corriendo 24/7)
+• Instalar Git en el servidor
+
+Paso 0.3 - Configurar el dominio
+• Apuntar tu dominio al Droplet (configurar DNS)
+• Instalar certificado SSL gratuito con Certbot (https://)
+
+ENTREGABLE: Al escribir tu dominio en el navegador, verias una pagina de bienvenida. Guardamos el primer snapshot en GitHub.
+FASE 1: Estructura del Proyecto y Diseño Base
+
+OBJETIVO: Crear la estructura de carpetas del proyecto y tener el diseño base de la tienda visible en tu dominio (Header, Footer, Home).
+Paso 1.1 - Crear el proyecto React
+• Ejecutar: npx create-react-app frontend
+• Instalar TailwindCSS
+• Definir paleta de colores basada en el logo de Mayja
+• Configurar estructura de carpetas: components, pages, hooks, utils
+
+Paso 1.2 - Header (navegacion superior)
+• Logo de Mayja
+• Menu de categorias: Hogar, Juguetes Sensoriales, Tecnologia, Ropa
+• Icono de carrito con contador
+• Buscador de productos
+• Diseño responsive (movil y escritorio)
+
+Paso 1.3 - Pagina de Inicio (Home)
+• Banner principal con imagen y mensaje de marca
+• Seccion 'Entregas en Lima 24-48h' (similar a HogarMas)
+• Grid de categorias con imagenes
+• Seccion 'Lo mas nuevo' (productos destacados)
+• Barra de confianza: clientes felices, años de experiencia, etc.
+
+Paso 1.4 - Footer
+• Logo y descripcion breve de Mayja
+• Links a categorias
+• Informacion de contacto
+• Icono de WhatsApp
+
+ENTREGABLE: La pagina de inicio de Mayja visible en tu dominio con diseño real. Snapshot en GitHub (v0.1).
+
+
+FASE 2: Catalogo de Productos
+
+OBJETIVO: Mostrar los productos con sus variantes (color, tamaño), pagina de detalle, y filtros por categoria. Por ahora con datos de prueba (sin base de datos real aun).
+Paso 2.1 - Datos de prueba
+• Crear archivo products.json con 10-15 productos de prueba
+• Estructura de cada producto: id, nombre, precio, categoria, imagenes, variantes (color, tamaño), descripcion, stock
+
+Paso 2.2 - Pagina de catalogo
+• Grid de tarjetas de productos (como HogarMas)
+• Filtro por categoria (Hogar, Juguetes, Tecnologia, Ropa)
+• Etiqueta 'NUEVO' en productos recientes
+• Precio visible en cada tarjeta
+• Boton 'Agregar al carrito'
+
+Paso 2.3 - Pagina de detalle del producto
+• Galeria de imagenes con zoom
+• Nombre, precio, descripcion
+• Selector de variantes: color y tamaño
+• Boton 'Agregar al carrito' grande
+• Boton de WhatsApp para consultas
+
+ENTREGABLE: Catalogo funcional con productos de prueba. Puedes navegar entre categorias y ver el detalle de cada producto. Snapshot en GitHub (v0.2).
+FASE 3: Backend y Base de Datos
+
+OBJETIVO: Crear la API REST con Node.js/Express y la base de datos PostgreSQL. Los productos del catalogo ahora vienen de la base de datos real.
+Paso 3.1 - Configurar el backend
+• Crear proyecto Node.js + Express en carpeta backend/
+• Instalar dependencias: express, pg (PostgreSQL), cors, dotenv, bcrypt, jsonwebtoken
+• Configurar variables de entorno (.env): datos de base de datos, claves secretas
+
+Paso 3.2 - Diseñar la base de datos
+• Tabla: productos (id, nombre, descripcion, precio, categoria, imagenes, activo)
+• Tabla: variantes (id, producto_id, color, tamaño, stock)
+• Tabla: pedidos (id, nombre_cliente, telefono, direccion, total, estado, fecha)
+• Tabla: items_pedido (id, pedido_id, producto_id, variante_id, cantidad, precio)
+• Tabla: usuarios_admin (id, email, password_hash, nombre)
+
+Paso 3.3 - Crear los endpoints de la API
+• GET /api/productos - Listar todos los productos
+• GET /api/productos/:id - Detalle de un producto
+• GET /api/productos?categoria=hogar - Filtrar por categoria
+• POST /api/pedidos - Crear un nuevo pedido
+• POST /api/admin/login - Autenticacion del administrador
+
+Paso 3.4 - Conectar frontend con backend
+• Reemplazar products.json con llamadas reales a la API
+• Configurar CORS para que React pueda hablar con Express
+
+ENTREGABLE: Los productos vienen de la base de datos PostgreSQL real. La tienda esta conectada de punta a punta. Snapshot en GitHub (v0.3).
+
+
+FASE 4: Carrito de Compras y Checkout
+
+OBJETIVO: El cliente puede agregar productos al carrito, revisar su pedido, y completar una compra con pago contra entrega.
+Paso 4.1 - Carrito de compras
+• Sidebar que se abre al hacer click en el icono del carrito
+• Lista de productos agregados con imagen, nombre, variante, precio
+• Boton para cambiar cantidad o eliminar productos
+• Subtotal calculado automaticamente
+• El carrito se guarda en el navegador (localStorage)
+
+Paso 4.2 - Pagina de Checkout
+• Formulario: Nombre completo, Telefono, Direccion de entrega, Referencia, Distrito
+• Resumen del pedido con todos los productos
+• Total final
+• Boton: 'Confirmar pedido - Pago contra entrega'
+
+Paso 4.3 - Confirmacion del pedido
+• Al confirmar, se guarda el pedido en la base de datos
+• Pagina de 'Pedido confirmado' con numero de pedido
+• Mensaje automatico de WhatsApp con el resumen del pedido
+
+ENTREGABLE: Flujo de compra completo funcional. Un cliente puede comprar desde el catalogo hasta recibir la confirmacion. Snapshot en GitHub (v0.4).
+FASE 5: Panel de Administracion
+
+OBJETIVO: Tener tu propio panel para gestionar productos, ver pedidos, y administrar la tienda sin tocar codigo.
+Paso 5.1 - Login de administrador
+• Pagina de login protegida: /admin
+• Autenticacion con email y password
+• Session segura con JWT (token de autenticacion)
+
+Paso 5.2 - Gestion de productos
+• Lista de todos los productos con imagen, nombre, precio, stock
+• Boton 'Agregar producto' con formulario completo
+• Subida de imagenes directamente desde tu computadora
+• Editar o eliminar productos existentes
+• Activar/desactivar productos del catalogo
+
+Paso 5.3 - Gestion de pedidos
+• Lista de pedidos con estado: Nuevo, En preparacion, Enviado, Entregado
+• Detalle de cada pedido: cliente, direccion, productos, total
+• Cambiar el estado de un pedido
+• Exportar pedidos del dia (para preparacion de envios)
+
+ENTREGABLE: Panel de administracion completo. Puedes gestionar tu tienda de forma autonoma. Snapshot en GitHub (v1.0) - VERSION FINAL LISTA PARA LANZAMIENTO.
+
+
+4. FASES FUTURAS (Post-Lanzamiento)
+
+Una vez la tienda este funcionando, estas funcionalidades se pueden agregar gradualmente:
+
+• FASE 6: Pasarela de pagos online (Culqi o Niubiz - Peru)
+• FASE 7: Sistema de busqueda avanzada con filtros de precio
+• FASE 8: Lista de deseos (wishlist)
+• FASE 9: Sistema de reseñas de productos
+• FASE 10: Cupones de descuento y promociones
+• FASE 11: Seguimiento de pedidos para el cliente
+• FASE 12: Notificaciones por email al cliente y a ti
+
+5. REFERENCIA: SITIO HOGARMAS.PE
+
+Estos son los elementos de HogarMas.pe que tomaremos como referencia para Mayja:
+
+• Barra superior con mensaje de envios (adaptar para Mayja)
+• Menu de navegacion por categorias con submenu desplegable
+• Banner rotativo en el home
+• Barra de confianza: estadisticas de clientes y envios
+• Grid de productos 'Lo mas nuevo' con etiqueta de categoria
+• Footer con informacion de contacto
+• Diseño limpio y profesional con buena tipografia
+
+DIFERENCIA CLAVE: Mayja usara los colores propios de su logo en lugar de los colores de HogarMas. Aporta identidad propia a la marca.
+6. PRIMEROS PASOS - COMO INICIAR
+
+Para comenzar el desarrollo, en tu proxima sesion adjunta este documento y di lo siguiente:
+
+MENSAJE PARA LA PROXIMA SESION:  "Hola, quiero comenzar el desarrollo de mi tienda Mayja. Adjunto el Plan de Trabajo. Estamos en FASE 0, Paso 0.1. Ayudame a configurar el repositorio de GitHub y a preparar los primeros archivos del proyecto."
+Recuerda siempre adjuntar:
+• Este archivo PLAN_DE_TRABAJO.docx
+• El archivo BITACORA.md (actualizado al terminar cada sesion)
+
+
+MAYJA - Plan de Trabajo v1.0
+Documento generado para uso interno del proyecto
