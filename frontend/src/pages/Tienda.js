@@ -1,117 +1,28 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import productos from '../utils/products.json';
 
 const Tienda = () => {
-  const productos = [
-    { 
-      id: 1, 
-      nombre: "Humidificador Ultrasónico", 
-      precio: 89.90, 
-      precioOriginal: null, 
-      imagen: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300&h=300&fit=crop", 
-      categoria: "Hogar",
-      etiquetas: ["Nuevo"]
-    },
-    { 
-      id: 2, 
-      nombre: "Juguete Pop It Gigante", 
-      precio: 45.00, 
-      precioOriginal: null, 
-      imagen: "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=300&h=300&fit=crop", 
-      categoria: "Juguetes",
-      etiquetas: ["Oferta"]
-    },
-    { 
-      id: 3, 
-      nombre: "Audífonos Bluetooth Pro", 
-      precio: 129.00, 
-      precioOriginal: 159.00, 
-      imagen: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=300&fit=crop", 
-      categoria: "Tecnología",
-      etiquetas: []
-    },
-    { 
-      id: 4, 
-      nombre: "Set de Luces LED Smart", 
-      precio: 55.00, 
-      precioOriginal: null, 
-      imagen: "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=300&h=300&fit=crop", 
-      categoria: "Hogar",
-      etiquetas: ["Básicos"]
-    },
-    { 
-      id: 5, 
-      nombre: "Pantalón Térmico Invierno", 
-      precio: 75.00, 
-      precioOriginal: 95.00, 
-      imagen: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=300&h=300&fit=crop", 
-      categoria: "Ropa",
-      etiquetas: ["Top"]
-    },
-    { 
-      id: 6, 
-      nombre: "Lámpara de Escritorio", 
-      precio: 65.00, 
-      precioOriginal: null, 
-      imagen: "https://images.unsplash.com/photo-1534073828943-f801091bb18c?w=300&h=300&fit=crop", 
-      categoria: "Hogar",
-      etiquetas: []
-    },
-    { 
-      id: 7, 
-      nombre: "Kit de Relajación Sensorial", 
-      precio: 95.00, 
-      precioOriginal: null, 
-      imagen: "https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=300&h=300&fit=crop", 
-      categoria: "Juguetes",
-      etiquetas: ["Nuevo"]
-    },
-    { 
-      id: 8, 
-      nombre: "Cargador Carga Rápida", 
-      precio: 39.00, 
-      precioOriginal: 49.00, 
-      imagen: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=300&h=300&fit=crop", 
-      categoria: "Tecnología",
-      etiquetas: ["Oferta"]
-    },
-    { 
-      id: 9, 
-      nombre: "Alfombra Antideslizante", 
-      precio: 49.00, 
-      precioOriginal: null, 
-      imagen: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=300&h=300&fit=crop", 
-      categoria: "Hogar",
-      etiquetas: []
-    },
-    { 
-      id: 10, 
-      nombre: "Casaca Impermeable", 
-      precio: 150.00, 
-      precioOriginal: 199.00, 
-      imagen: "https://images.unsplash.com/photo-1544022613-e87ca75a784a?w=300&h=300&fit=crop", 
-      categoria: "Ropa",
-      etiquetas: ["Oferta"]
-    },
-    { 
-      id: 11, 
-      nombre: "Set de 4 Contenedores Herméticos", 
-      precio: 76.00, 
-      precioOriginal: 95.00, 
-      imagen: "https://images.unsplash.com/photo-1588195030432-7f9e9b334b1a?w=300&h=300&fit=crop", 
-      categoria: "Hogar",
-      etiquetas: []
-    },
-    { 
-      id: 12, 
-      nombre: "Botellas Dispensadoras Verdes", 
-      precio: 49.00, 
-      precioOriginal: 65.00, 
-      imagen: "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=300&h=300&fit=crop", 
-      categoria: "Baño",
-      etiquetas: ["Nuevo"]
+  const [categoriaActiva, setCategoriaActiva] = useState('Todos');
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const searchQuery = searchParams.get('search') || '';
+  
+  const categorias = ['Todos', 'Hogar', 'Juguetes', 'Tecnología', 'Ropa'];
+
+  // Resetear categoría si hay una búsqueda nueva desde fuera
+  useEffect(() => {
+    if (searchQuery) {
+      setCategoriaActiva('Todos');
     }
-  ];
+  }, [searchQuery]);
+
+  const productosFiltrados = productos.filter(p => {
+    const matchesCategory = categoriaActiva === 'Todos' || p.categoria === categoriaActiva;
+    const matchesSearch = p.nombre.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          p.categoria.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   const getDescuentoPercentage = (precio, precioOriginal) => {
     if (!precioOriginal || precioOriginal <= precio) return 0;
@@ -121,81 +32,135 @@ const Tienda = () => {
   return (
     <div className="bg-gray-50 min-h-[calc(100vh-200px)] font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="mb-10">
-          <h1 className="text-4xl font-black text-primary-500 mb-2 uppercase tracking-tighter">Tienda</h1>
-          <div className="h-1 w-20 bg-secondary-500"></div>
+        <div className="mb-10 text-center">
+          <h1 className="text-4xl font-black text-primary-500 mb-2 uppercase tracking-tighter">Nuestra Tienda</h1>
+          <div className="h-1 w-20 bg-secondary-500 mx-auto mb-8"></div>
+          
+          {/* Barra de Filtros */}
+          <div className="flex flex-wrap justify-center gap-3 mb-8">
+            {categorias.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setCategoriaActiva(cat)}
+                className={`px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all
+                ${categoriaActiva === cat 
+                  ? 'bg-primary-500 text-white shadow-lg' 
+                  : 'bg-white text-gray-500 hover:bg-gray-100 border border-gray-200'}`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {searchQuery && (
+            <div className="mb-8 flex items-center justify-center space-x-2">
+              <span className="text-gray-500 text-sm">Resultados para:</span>
+              <span className="bg-secondary-100 text-secondary-500 px-3 py-1 rounded-full text-sm font-bold">"{searchQuery}"</span>
+              <Link to="/tienda" className="text-gray-400 hover:text-red-500 transition-colors">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </Link>
+            </div>
+          )}
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {productos.map(producto => {
-            const descuento = getDescuentoPercentage(producto.precio, producto.precioOriginal);
-            return (
-              <div key={producto.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow group">
-                <div className="relative h-48">
-                  <img 
-                    src={producto.imagen} 
-                    alt={producto.nombre} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  
-                  {/* Etiquetas */}
-                  <div className="flex flex-col absolute top-2 left-2 space-y-2">
-                    {producto.etiquetas.map((etiqueta, index) => (
-                      <span 
-                        key={index} 
-                        className={`px-2 py-0.5 text-xs font-medium rounded 
-                        ${etiqueta === 'Nuevo' ? 'bg-primary-500 text-white' : ''}
-                        ${etiqueta === 'Oferta' ? 'bg-red-500 text-white' : ''}
-                        ${etiqueta === 'Básicos' || etiqueta === 'Top' ? 'bg-secondary-500 text-white' : ''}
-                        `}
-                      >
-                        {etiqueta}
-                      </span>
-                    ))}
+        {productosFiltrados.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {productosFiltrados.map(producto => {
+              const descuento = getDescuentoPercentage(producto.precio, producto.precioOriginal);
+              return (
+                <div key={producto.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300 group flex flex-col">
+                  <div className="relative h-64 overflow-hidden">
+                    <img 
+                      src={producto.imagenes[0]} 
+                      alt={producto.nombre} 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
                     
-                    {/* Descuento */}
-                    {descuento > 0 && (
-                      <span className="px-2 py-0.5 text-xs font-medium bg-primary-500 text-white rounded">
-                        -{descuento}%
-                      </span>
-                    )}
+                    {/* Etiquetas */}
+                    <div className="flex flex-col absolute top-3 left-3 space-y-2 z-10">
+                      {producto.badge && (
+                        <span 
+                          className={`px-3 py-1 text-[10px] font-bold rounded-sm tracking-widest
+                          ${producto.badge === 'NUEVO' ? 'bg-primary-500 text-white' : ''}
+                          ${producto.badge === 'OFERTA' || producto.badge === 'HOT SALE' ? 'bg-red-600 text-white' : ''}
+                          ${producto.badge === 'TOP' ? 'bg-secondary-500 text-white' : ''}
+                          `}
+                        >
+                          {producto.badge}
+                        </span>
+                      )}
+                      
+                      {/* Descuento */}
+                      {descuento > 0 && (
+                        <span className="px-3 py-1 text-[10px] font-bold bg-primary-500 text-white rounded-sm tracking-widest">
+                          -{descuento}%
+                        </span>
+                      )}
+                    </div>
+                    
+                    {/* Vista rápida Overlay */}
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                      <Link 
+                        to={`/producto/${producto.id}`}
+                        className="bg-white text-primary-500 px-6 py-2.5 rounded-full text-xs font-bold shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 hover:bg-primary-500 hover:text-white"
+                      >
+                        VER PRODUCTO
+                      </Link>
+                    </div>
                   </div>
                   
-                  {/* Vista rápida (placeholder) */}
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all duration-300 opacity-0 group-hover:opacity-100">
-                    <button className="text-white text-sm font-medium">
-                      Vista rápida
+                  <div className="p-4 flex-grow flex flex-col text-center">
+                    <p className="text-gray-400 text-[10px] uppercase tracking-[0.2em] mb-2 font-semibold">{producto.categoria}</p>
+                    
+                    <Link to={`/producto/${producto.id}`} className="block mb-3 flex-grow">
+                      <h3 className="font-bold text-gray-800 hover:text-secondary-500 transition-colors line-clamp-2 text-sm uppercase tracking-tight">
+                        {producto.nombre}
+                      </h3>
+                    </Link>
+                    
+                    <div className="mb-4">
+                      {descuento > 0 ? (
+                        <div className="flex items-center justify-center space-x-3">
+                          <p className="line-through text-gray-400 text-xs">S/ {producto.precioOriginal.toFixed(2)}</p>
+                          <p className="text-lg font-black text-secondary-500 tracking-tighter">S/ {producto.precio.toFixed(2)}</p>
+                        </div>
+                      ) : (
+                        <p className="text-lg font-black text-secondary-500 tracking-tighter">S/ {producto.precio.toFixed(2)}</p>
+                      )}
+                    </div>
+                    
+                    <button 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        alert(`Producto ${producto.nombre} añadido al carrito`);
+                      }}
+                      className="w-full bg-primary-500 text-white font-bold py-3 px-4 rounded hover:bg-primary-600 transition-all transform active:scale-95 text-[10px] tracking-[0.2em] uppercase"
+                    >
+                      AGREGAR AL CARRITO
                     </button>
                   </div>
                 </div>
-                <div className="p-5">
-                  <Link to={`/producto/${producto.id}`} className="block mb-3">
-                    <h3 className="font-semibold text-gray-800 hover:text-secondary-500 transition-colors line-clamp-2">
-                      {producto.nombre}
-                    </h3>
-                  </Link>
-                  <p className="text-gray-600 text-sm mb-2">{producto.categoria}</p>
-                  <div className="mb-4">
-                    {descuento > 0 ? (
-                      <>
-                        <p className="line-through text-gray-400">S/ {producto.precioOriginal.toFixed(2)}</p>
-                        <p className="text-xl font-bold text-primary-500">S/ {producto.precio.toFixed(2)}</p>
-                      </>
-                    ) : (
-                      <p className="text-xl font-bold text-primary-500">S/ {producto.precio.toFixed(2)}</p>
-                    )}
-                  </div>
-                  <button 
-                    onClick={() => alert(`Producto ${producto.nombre} añadido al carrito`)}
-                    className="w-full bg-secondary-500 text-white font-bold py-2 px-4 rounded-full hover:bg-secondary-600 transition-all transform active:scale-95"
-                  >
-                    Añadir al carrito
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-20 bg-white rounded-xl shadow-sm border border-gray-100">
+            <div className="text-6xl mb-4">🔍</div>
+            <p className="text-gray-500 text-lg mb-6">
+              No encontramos resultados para <span className="font-bold">"{searchQuery || categoriaActiva}"</span>
+            </p>
+            <div className="flex justify-center gap-4">
+              <Link 
+                to="/tienda"
+                className="bg-primary-500 text-white px-6 py-2 rounded-full font-bold text-sm hover:bg-primary-600 transition-all"
+              >
+                Ver todos los productos
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

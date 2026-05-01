@@ -1,7 +1,17 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Header = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      navigate(`/tienda?search=${encodeURIComponent(searchTerm.trim())}`);
+      setSearchTerm('');
+    }
+  };
   return (
     <div className="sticky top-0 z-50">
       {/* Barra superior (Top Bar) */}
@@ -29,18 +39,23 @@ const Header = () => {
             
             {/* Buscador central */}
             <div className="hidden lg:flex flex-1 max-w-lg mx-10">
-              <div className="relative w-full">
+              <form onSubmit={handleSearch} className="relative w-full">
                 <input 
                   type="text" 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="¿Qué buscas para tu hogar?" 
                   className="w-full pl-4 pr-12 py-2 border-2 border-primary-500 rounded-full focus:outline-none text-sm font-medium"
                 />
-                <button className="absolute right-0 top-0 h-full px-5 bg-primary-500 text-white rounded-r-full hover:bg-primary-600 transition-colors">
+                <button 
+                  type="submit"
+                  className="absolute right-0 top-0 h-full px-5 bg-primary-500 text-white rounded-r-full hover:bg-primary-600 transition-colors"
+                >
                   <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
                   </svg>
                 </button>
-              </div>
+              </form>
             </div>
             
             {/* Acciones y Menú simplificado */}
