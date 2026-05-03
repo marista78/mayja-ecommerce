@@ -249,7 +249,26 @@ app.post('/api/reclamaciones', async (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.send('Mayja API is running...');
+  res.send(`<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mayja - Próximamente</title>
+  <style>
+    body { margin: 0; font-family: sans-serif; background: #111; color: #fff;
+           display: flex; align-items: center; justify-content: center; height: 100vh; text-align: center; }
+    h1 { font-size: 3rem; margin-bottom: 0.5rem; }
+    p  { color: #aaa; font-size: 1.1rem; }
+  </style>
+</head>
+<body>
+  <div>
+    <h1>🚧 En construcción</h1>
+    <p>Estamos trabajando para traerte algo increíble. ¡Vuelve pronto!</p>
+  </div>
+</body>
+</html>`);
 });
 
 // Start server
