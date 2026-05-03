@@ -211,6 +211,8 @@ app.post('/api/contacto', async (req, res) => {
     console.error(err);
     res.status(500).json({ error: 'Error al enviar el mensaje' });
   }
+});
+
 // POST Reclamación (Libro de Reclamaciones)
 app.post('/api/reclamaciones', async (req, res) => {
   const { 
