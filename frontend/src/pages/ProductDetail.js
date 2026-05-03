@@ -1,13 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import productos from '../utils/products.json';
+import API_URL from '../apiConfig';
 
 const ProductDetail = () => {
   const { id } = useParams();
+  const { addToCart } = useCart();
+  const [productos, setProductos] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [activeImg, setActiveImg] = useState(0);
   const [cantidad, setCantidad] = useState(1);
   const [activeTab, setActiveTab] = useState('descripcion');
   
+  useEffect(() => {
+    const fetchProductos = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/products`);
+        const data = await response.json();
+        setProductos(data);
+      } catch (err) {
+        console.error('Error fetching products:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProductos();
+  }, []);
+
   const producto = productos.find(p => p.id === parseInt(id));
 
   useEffect(() => {
@@ -15,6 +31,14 @@ const ProductDetail = () => {
     setActiveImg(0);
     setCantidad(1);
   }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-secondary-500"></div>
+      </div>
+    );
+  }
 
   if (!producto) {
     return (
@@ -32,7 +56,7 @@ const ProductDetail = () => {
     return Math.round(((precioOriginal - precio) / precioOriginal) * 100);
   };
 
-  const descuento = getDescuentoPercentage(producto.precio, producto.precioOriginal);
+  const descuento = getDescuentoPercentage(producto.precio, producto.precio_original);
 
   // Productos relacionados (misma categoría)
   const relacionados = productos
@@ -51,59 +75,100 @@ const ProductDetail = () => {
           <span className="text-primary-500">{producto.nombre}</span>
         </nav>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
-          {/* Columna Izquierda: Galería */}
-          <div className="space-y-4">
-            <div className="relative aspect-square overflow-hidden bg-gray-100 rounded-lg shadow-inner">
-              <img 
-                src={producto.imagenes[activeImg]} 
-                alt={producto.nombre} 
-                className="w-full h-full object-cover"
-              />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-20">
+          {/* Columna Izquierda: Galería (Lg: 7 cols) */}
+          <div className="lg:col-span-7 space-y-6">
+            <div className="relative aspect-square overflow-hidden bg-slate-50 rounded-2xl border border-slate-100 group">
+              {activeImg < (producto.imagenes || []).length ? (
+                <img 
+                  src={(producto.imagenes || [])[activeImg]} 
+                  alt={producto.nombre} 
+                  className="w-full h-full object-cover transition-all duration-700 ease-in-out transform group-hover:scale-105"
+                />
+              ) : (
+                <video 
+                  src={producto.video_url} 
+                  className="w-full h-full object-cover" 
+                  autoPlay 
+                  loop 
+                  muted 
+                  playsInline 
+                />
+              )}
               {producto.badge && (
-                <span className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 text-[10px] font-bold tracking-widest rounded-sm uppercase">
+                <div className="absolute top-6 left-6 bg-slate-900 text-white px-4 py-1.5 text-[10px] font-black tracking-[0.2em] rounded-full uppercase shadow-xl">
                   {producto.badge}
-                </span>
+                </div>
+              )}
+              {/* Botones de navegación sobre la imagen */}
+              {((producto.imagenes || []).length + (producto.video_url ? 1 : 0)) > 1 && (
+                <>
+                  <button 
+                    onClick={() => {
+                      const totalItems = producto.imagenes.length + (producto.video_url ? 1 : 0);
+                      setActiveImg(activeImg === 0 ? totalItems - 1 : activeImg - 1);
+                    }}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-md w-10 h-10 rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-all text-slate-800 hover:bg-white"
+                  >←</button>
+                  <button 
+                    onClick={() => {
+                      const totalItems = (producto.imagenes || []).length + (producto.video_url ? 1 : 0);
+                      setActiveImg(activeImg === totalItems - 1 ? 0 : activeImg + 1);
+                    }}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-md w-10 h-10 rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-all text-slate-800 hover:bg-white"
+                  >→</button>
+                </>
               )}
             </div>
             
-            {producto.imagenes.length > 1 && (
-              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                {producto.imagenes.map((img, index) => (
+            {((producto.imagenes || []).length > 1 || producto.video_url) && (
+              <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                {(producto.imagenes || []).map((img, index) => (
                   <button 
                     key={index}
                     onClick={() => setActiveImg(index)}
-                    className={`relative w-20 h-20 flex-shrink-0 rounded-md overflow-hidden border-2 transition-all 
-                      ${activeImg === index ? 'border-secondary-500' : 'border-transparent hover:border-gray-200'}`}
+                    className={`relative w-24 h-24 flex-shrink-0 rounded-xl overflow-hidden border-2 transition-all duration-300
+                      ${activeImg === index ? 'border-slate-900 scale-95 shadow-md' : 'border-slate-100 hover:border-slate-300 opacity-70 hover:opacity-100'}`}
                   >
                     <img src={img} alt={`Miniatura ${index}`} className="w-full h-full object-cover" />
                   </button>
                 ))}
+                {producto.video_url && (
+                  <button 
+                    onClick={() => setActiveImg((producto.imagenes || []).length)}
+                    className={`relative w-24 h-24 flex-shrink-0 rounded-xl overflow-hidden border-2 transition-all duration-300 bg-slate-100 flex flex-col items-center justify-center
+                      ${activeImg === (producto.imagenes || []).length ? 'border-slate-900 scale-95 shadow-md' : 'border-slate-100 hover:border-slate-300 opacity-70 hover:opacity-100'}`}
+                  >
+                    <span className="text-2xl mb-1">📹</span>
+                    <span className="text-[10px] font-bold uppercase">Video</span>
+                  </button>
+                )}
               </div>
             )}
           </div>
           
-          {/* Columna Derecha: Info */}
-          <div className="flex flex-col">
+          {/* Columna Derecha: Info (Lg: 5 cols) */}
+          <div className="lg:col-span-5 flex flex-col pt-2">
+
             <div className="border-b border-gray-100 pb-6 mb-6">
               <p className="text-secondary-500 text-xs font-bold uppercase tracking-[0.2em] mb-3">{producto.subcategoria || producto.categoria}</p>
-              <h1 className="text-3xl sm:text-4xl font-black text-primary-500 mb-4 leading-tight tracking-tighter uppercase">{producto.nombre}</h1>
+              <h1 className="text-3xl sm:text-4xl font-black text-primary-500 mb-2 leading-tight tracking-tighter uppercase">{producto.nombre}</h1>
+              {producto.concepto && (
+                <p className="text-gray-500 text-sm italic mb-4">{producto.concepto}</p>
+              )}
               
               <div className="flex items-center space-x-4 mb-6">
                 {descuento > 0 ? (
                   <>
-                    <span className="text-3xl font-black text-secondary-500 tracking-tighter">S/ {producto.precio.toFixed(2)}</span>
-                    <span className="text-xl text-gray-300 line-through">S/ {producto.precioOriginal.toFixed(2)}</span>
+                    <span className="text-3xl font-black text-secondary-500 tracking-tighter">S/ {Number(producto.precio).toFixed(2)}</span>
+                    <span className="text-xl text-gray-300 line-through">S/ {Number(producto.precio_original).toFixed(2)}</span>
                     <span className="bg-primary-500 text-white px-2 py-1 text-[10px] font-bold rounded-sm">-{descuento}%</span>
                   </>
                 ) : (
-                  <span className="text-3xl font-black text-secondary-500 tracking-tighter">S/ {producto.precio.toFixed(2)}</span>
+                  <span className="text-3xl font-black text-secondary-500 tracking-tighter">S/ {Number(producto.precio).toFixed(2)}</span>
                 )}
               </div>
-              
-              <div className="text-gray-600 text-sm leading-relaxed mb-8">
-                {producto.descripcion}
-              </div>
+
             </div>
             
             {/* Acciones de Compra */}
@@ -127,7 +192,7 @@ const ProductDetail = () => {
                 </div>
                 
                 <button 
-                  onClick={() => alert(`${cantidad} unidad(es) de ${producto.nombre} añadidas al carrito`)}
+                  onClick={() => addToCart(producto, cantidad)}
                   className="flex-grow bg-primary-500 text-white font-bold h-12 rounded-full uppercase tracking-widest text-xs hover:bg-primary-600 transition-all shadow-lg active:scale-95"
                 >
                   Agregar al carrito
@@ -135,7 +200,10 @@ const ProductDetail = () => {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4">
-                <button className="flex-1 bg-secondary-500 text-white font-bold h-12 rounded-full uppercase tracking-widest text-xs hover:bg-secondary-600 transition-all shadow-md active:scale-95">
+                <button 
+                  onClick={() => addToCart(producto, cantidad)}
+                  className="flex-1 bg-secondary-500 text-white font-bold h-12 rounded-full uppercase tracking-widest text-xs hover:bg-secondary-600 transition-all shadow-md active:scale-95"
+                >
                   Comprar ahora
                 </button>
                 <a 
@@ -173,18 +241,39 @@ const ProductDetail = () => {
               
               <div className="text-gray-600 text-sm leading-relaxed min-h-[100px]">
                 {activeTab === 'descripcion' && (
-                  <ul className="space-y-3">
-                    {producto.detalles.map((detalle, index) => (
-                      <li key={index} className="flex border-b border-gray-50 pb-2">
-                        <span className="text-gray-600">{detalle}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="space-y-4">
+                    <ul className="space-y-2">
+                      {(producto.descripcion || '').split('\n').filter(line => line.trim()).map((line, i) => (
+                        <li key={i} className="flex items-start gap-2 text-gray-600 pb-1">
+                          <span className="text-secondary-500 font-bold mt-0.5 flex-shrink-0">•</span>
+                          <span>{line.trim()}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    {(producto.detalles || []).length > 0 && (
+                      <ul className="mt-4 space-y-2 border-t border-gray-100 pt-4">
+                        {(producto.detalles || []).map((detalle, index) => (
+                          <li key={index} className="flex items-center gap-2 text-gray-600 border-b border-gray-50 pb-2">
+                            <span className="text-secondary-500 font-bold">•</span>
+                            <span>{detalle}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
                 )}
                 {activeTab === 'envio' && (
-                  <p className="bg-gray-50 p-6 rounded-md italic whitespace-pre-line text-gray-600">
-                    {producto.envio}
-                  </p>
+                  <div className="bg-gray-50 p-6 rounded-md">
+                    <p className="whitespace-pre-line text-gray-600 italic">
+                      {producto.envio || `Los plazos de entrega se contabilizan desde que verificamos el pago de tu compra.
+
+Lima: Dentro de los 2 días hábiles siguientes.
+
+Distritos de reparto: Todo Lima Metropolitana.
+
+Provincia: Dentro de los 4 días hábiles siguientes. Llegamos a todo el territorio peruano donde existan puntos de entrega de Olva Courier.`}
+                    </p>
+                  </div>
                 )}
               </div>
             </div>
@@ -212,7 +301,7 @@ const ProductDetail = () => {
                     </div>
                   </div>
                   <h3 className="text-xs font-bold text-gray-800 line-clamp-1 uppercase group-hover:text-secondary-500 transition-colors">{p.nombre}</h3>
-                  <p className="text-secondary-500 font-black text-sm">S/ {p.precio.toFixed(2)}</p>
+                  <p className="text-secondary-500 font-black text-sm">S/ {Number(p.precio).toFixed(2)}</p>
                 </Link>
               ))}
             </div>

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 
 const Header = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+  const { cartCount, setIsCartOpen } = useCart();
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -12,6 +14,7 @@ const Header = () => {
       setSearchTerm('');
     }
   };
+
   return (
     <div className="sticky top-0 z-50">
       {/* Barra superior (Top Bar) */}
@@ -67,14 +70,17 @@ const Header = () => {
               </nav>
 
               <div className="flex items-center space-x-4 pl-6 border-l border-gray-200">
-                <Link to="/carrito" className="relative text-gray-700 hover:text-secondary-500 transition-colors">
+                <button 
+                  onClick={() => setIsCartOpen(true)}
+                  className="relative text-gray-700 hover:text-secondary-500 transition-colors"
+                >
                   <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 11V7a4 4 0 11-8 0v4M5 9h14l1 12H4L5 9z" />
                   </svg>
                   <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center text-[10px] font-bold text-white bg-secondary-500 rounded-full">
-                    0
+                    {cartCount}
                   </span>
-                </Link>
+                </button>
                 
                 {/* Menú móvil */}
                 <button className="md:hidden text-gray-700">

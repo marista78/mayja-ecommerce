@@ -36,7 +36,10 @@ const Footer = () => {
             <ul className="space-y-4 text-sm font-medium">
               <li><a href="#" className="hover:text-secondary-500 transition-colors text-gray-300">Términos y Condiciones</a></li>
               <li><a href="#" className="hover:text-secondary-500 transition-colors text-gray-300">Políticas de Privacidad</a></li>
-              <li><a href="#" className="hover:text-secondary-500 transition-colors text-gray-300">Libro de Reclamaciones</a></li>
+              <li><Link to="/libro-de-reclamaciones" className="flex items-center gap-2 hover:text-secondary-500 transition-colors text-gray-300">
+                <img src="/img/libro.png" alt="Libro de Reclamaciones" className="h-8 w-auto bg-white p-1 rounded shadow-sm" />
+                Libro de Reclamaciones
+              </Link></li>
             </ul>
           </div>
           

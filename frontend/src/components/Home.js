@@ -1,12 +1,32 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import productos from '../utils/products.json';
+import { useCart } from '../context/CartContext';
+import API_URL from '../apiConfig';
 
 const Home = () => {
-  const products = productos.slice(0, 5); // Tomamos los primeros 5 para el home
+  const { addToCart } = useCart();
+  const [productos, setProductos] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProductos = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/products`);
+        const data = await response.json();
+        setProductos(data);
+      } catch (err) {
+        console.error('Error fetching products:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProductos();
+  }, []);
+
+  const featuredProducts = productos.slice(0, 4);
 
   return (
-    <div className="bg-gray-50 pb-20 font-sans">
+    <div className="bg-gray-50 pb-8 font-sans">
       {/* Hero Section */}
       <section className="relative bg-primary-500 h-[400px] flex items-center overflow-hidden">
         <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
@@ -30,7 +50,7 @@ const Home = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { name: 'Hogar', icon: '🏠' },
-            { name: 'Juguetes', icon: '🧩' },
+            { name: 'Sensorial', icon: '🧠' },
             { name: 'Tecnología', icon: '💻' },
             { name: 'Ropa', icon: '👕' }
           ].map((cat) => (
@@ -54,8 +74,8 @@ const Home = () => {
           <Link to="/tienda" className="text-secondary-500 font-bold hover:underline">Ver todos &rarr;</Link>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-          {products.map((product) => (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {featuredProducts.map((product) => (
             <div key={product.id} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group flex flex-col h-full border border-gray-100">
               <div className="relative aspect-square overflow-hidden bg-gray-100">
                 <Link to={`/producto/${product.id}`}>
@@ -88,8 +108,14 @@ const Home = () => {
                     {product.nombre}
                   </h3>
                 </Link>
-                <div className="mt-auto pt-2">
-                  <span className="text-lg font-extrabold text-secondary-500">S/ {product.precio.toFixed(2)}</span>
+                <div className="mt-auto pt-4">
+                  <p className="text-lg font-extrabold text-secondary-500 mb-3">S/ {Number(product.precio).toFixed(2)}</p>
+                  <button 
+                    onClick={() => addToCart(product)}
+                    className="w-full bg-primary-500 text-white font-bold py-2 rounded-full text-[10px] uppercase tracking-widest hover:bg-primary-600 transition-all active:scale-95 shadow-md"
+                  >
+                    Agregar al carrito
+                  </button>
                 </div>
               </div>
             </div>
@@ -98,22 +124,22 @@ const Home = () => {
       </section>
 
       {/* Info Sections */}
-      <section className="bg-white py-16 mt-20 border-t border-gray-100">
+      <section className="bg-white py-10 mt-12 border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
             <div>
-              <div className="text-4xl mb-4">🚚</div>
-              <h4 className="text-xl font-bold text-primary-500 mb-2">Envios</h4>
+              <div className="text-3xl mb-3">🚚</div>
+              <h4 className="text-lg font-bold text-primary-500 mb-1">Envios</h4>
               <p className="text-gray-500 text-sm">Envios en 24-48h en Lima</p>
             </div>
             <div>
-              <div className="text-4xl mb-4">🛡️</div>
-              <h4 className="text-xl font-bold text-primary-500 mb-2">Compra Segura</h4>
+              <div className="text-3xl mb-3">🛡️</div>
+              <h4 className="text-lg font-bold text-primary-500 mb-1">Compra Segura</h4>
               <p className="text-gray-500 text-sm">Protegemos tus datos, compra confiable.</p>
             </div>
             <div>
-              <div className="text-4xl mb-4">🤝</div>
-              <h4 className="text-xl font-bold text-primary-500 mb-2">Entrega confiable</h4>
+              <div className="text-3xl mb-3">🤝</div>
+              <h4 className="text-lg font-bold text-primary-500 mb-1">Entrega confiable</h4>
               <p className="text-gray-500 text-sm">Logistica segura y confiable</p>
             </div>
           </div>

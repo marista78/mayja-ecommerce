@@ -1,14 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import productos from '../utils/products.json';
+import { useCart } from '../context/CartContext';
+import API_URL from '../apiConfig';
 
 const Tienda = () => {
+  const { addToCart } = useCart();
+  const [productos, setProductos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [categoriaActiva, setCategoriaActiva] = useState('Todos');
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const searchQuery = searchParams.get('search') || '';
   
-  const categorias = ['Todos', 'Hogar', 'Juguetes', 'Tecnología', 'Ropa'];
+  useEffect(() => {
+    const fetchProductos = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${API_URL}/api/products`);
+        if (!response.ok) throw new Error('Error al conectar con la API');
+        const data = await response.json();
+        setProductos(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProductos();
+  }, []);
+
+  const categorias = ['Todos', 'Hogar', 'Sensorial', 'Tecnología', 'Ropa'];
 
   // Resetear categoría si hay una búsqueda nueva desde fuera
   useEffect(() => {
@@ -16,6 +38,22 @@ const Tienda = () => {
       setCategoriaActiva('Todos');
     }
   }, [searchQuery]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-secondary-500"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center text-red-500 font-bold">Error: {error}</div>
+      </div>
+    );
+  }
 
   const productosFiltrados = productos.filter(p => {
     const matchesCategory = categoriaActiva === 'Todos' || p.categoria === categoriaActiva;
@@ -68,7 +106,7 @@ const Tienda = () => {
         {productosFiltrados.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {productosFiltrados.map(producto => {
-              const descuento = getDescuentoPercentage(producto.precio, producto.precioOriginal);
+              const descuento = getDescuentoPercentage(producto.precio, producto.precio_original);
               return (
                 <div key={producto.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300 group flex flex-col">
                   <div className="relative h-64 overflow-hidden">
@@ -120,21 +158,17 @@ const Tienda = () => {
                       </h3>
                     </Link>
                     
-                    <div className="mb-4">
-                      {descuento > 0 ? (
-                        <div className="flex items-center justify-center space-x-3">
-                          <p className="line-through text-gray-400 text-xs">S/ {producto.precioOriginal.toFixed(2)}</p>
-                          <p className="text-lg font-black text-secondary-500 tracking-tighter">S/ {producto.precio.toFixed(2)}</p>
-                        </div>
-                      ) : (
-                        <p className="text-lg font-black text-secondary-500 tracking-tighter">S/ {producto.precio.toFixed(2)}</p>
-                      )}
-                    </div>
+                    <div className="flex flex-col items-center mb-6">
+                    <span className="text-2xl font-black text-secondary-500">S/ {Number(producto.precio).toFixed(2)}</span>
+                    {producto.precio_original && (
+                      <span className="text-xs text-gray-400 line-through">S/ {Number(producto.precio_original).toFixed(2)}</span>
+                    )}
+                  </div>
                     
                     <button 
                       onClick={(e) => {
                         e.preventDefault();
-                        alert(`Producto ${producto.nombre} añadido al carrito`);
+                        addToCart(producto);
                       }}
                       className="w-full bg-primary-500 text-white font-bold py-3 px-4 rounded hover:bg-primary-600 transition-all transform active:scale-95 text-[10px] tracking-[0.2em] uppercase"
                     >
